@@ -37,8 +37,17 @@ for any business-initiated/bulk message, not a limitation of this module.
         "security/ir.model.access.csv",
         "security/whatsapp_broadcast_security_rules.xml",
         "data/ir_cron_data.xml",
-        "views/whatsapp_campaign_views.xml",
+        # campaign_import_wizard_views.xml MUST load before
+        # whatsapp_campaign_views.xml: the campaign form's button uses
+        # %(action_whatsapp_campaign_import_wizard)d, and Odoo resolves a
+        # %(xmlid)d reference EAGERLY during XML parsing (odoo/tools/
+        # convert.py's _eval_xml -> id_get), not lazily at click time - the
+        # action record must already exist in ir.model.data by the time
+        # this file is parsed, or install fails with "External ID not
+        # found in the system". Confirmed via a real install error on
+        # hrms.logiceducation.org.
         "views/campaign_import_wizard_views.xml",
+        "views/whatsapp_campaign_views.xml",
         "views/whatsapp_menus.xml",
     ],
     "installable": True,
