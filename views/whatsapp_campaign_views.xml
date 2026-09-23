@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_whatsapp_campaign_form" model="ir.ui.view">
+        <field name="name">otm.whatsapp.campaign.form</field>
+        <field name="model">otm.whatsapp.campaign</field>
+        <field name="arch" type="xml">
+            <form string="WhatsApp Campaign">
+                <header>
+                    <button name="action_schedule" type="object" string="Schedule" class="btn-secondary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_start" type="object" string="Send Now" class="btn-primary"
+                            invisible="state not in ('draft', 'scheduled', 'paused')"/>
+                    <button name="action_pause" type="object" string="Pause"
+                            invisible="state != 'sending'"/>
+                    <button name="action_resume" type="object" string="Resume" class="btn-primary"
+                            invisible="state != 'paused'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('completed', 'cancelled')"
+                            confirm="Cancel this campaign? Recipients not yet sent to will be skipped."/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state not in ('cancelled', 'completed')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,scheduled,sending,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_build_recipients" type="object" class="oe_stat_button" icon="fa-users"
+                                invisible="state not in ('draft', 'scheduled')">
+                            <field name="total_count" widget="statinfo" string="Recipients"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. September Admissions Reminder"/></h1>
+                    </div>
+                    <group>
+                        <group string="Send Settings">
+                            <field name="phone_id"/>
+                            <field name="template_id"/>
+                            <field name="header_param_static"
+                                   invisible="not template_id"/>
+                            <field name="rate_limit_per_minute"/>
+                        </group>
+                        <group string="Schedule">
+                            <field name="scheduled_at"/>
+                            <field name="start_date" readonly="1"/>
+                            <field name="end_date" readonly="1"/>
+                            <field name="exclude_opted_out"/>
+                        </group>
+                    </group>
+                    <group string="Live Stats" invisible="state == 'draft'">
+                        <group>
+                            <field name="pending_count"/>
+                            <field name="sent_count"/>
+                        </group>
+                        <group>
+                            <field name="delivered_count"/>
+                            <field name="read_count"/>
+                            <field name="failed_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Recipients" name="recipients">
+                            <field name="contact_ids" widget="many2many_tags"
+                                   readonly="state not in ('draft', 'scheduled')"/>
+                            <button name="%(action_whatsapp_campaign_import_wizard)d" type="action"
+                                    string="Import by Phone Number" class="btn-secondary"
+                                    invisible="state not in ('draft', 'scheduled')"/>
+                            <field name="recipient_ids" readonly="1">
+                                <list>
+                                    <field name="contact_id"/>
+                                    <field name="state" decoration-success="state in ('sent','delivered','read')"
+                                           decoration-danger="state in ('failed',)"
+                                           decoration-muted="state in ('skipped','cancelled')"/>
+                                    <field name="error_message" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Template Variables" name="variables">
+                            <button name="action_sync_variables" type="object"
+                                    string="Sync Variables From Template" class="btn-secondary"
+                                    invisible="state not in ('draft', 'scheduled')"/>
+                            <field name="variable_ids" readonly="state not in ('draft', 'scheduled')">
+                                <list editable="bottom">
+                                    <field name="sequence"/>
+                                    <field name="source"/>
+                                    <field name="static_value" invisible="source != 'static'"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_whatsapp_campaign_list" model="ir.ui.view">
+        <field name="name">otm.whatsapp.campaign.list</field>
+        <field name="model">otm.whatsapp.campaign</field>
+        <field name="arch" type="xml">
+            <list string="WhatsApp Campaigns">
+                <field name="name"/>
+                <field name="phone_id"/>
+                <field name="template_id"/>
+                <field name="state" decoration-success="state == 'completed'"
+                       decoration-info="state == 'sending'" decoration-danger="state == 'cancelled'"/>
+                <field name="total_count" string="Recipients"/>
+                <field name="sent_count"/>
+                <field name="failed_count"/>
+                <field name="scheduled_at"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_whatsapp_campaign_search" model="ir.ui.view">
+        <field name="name">otm.whatsapp.campaign.search</field>
+        <field name="model">otm.whatsapp.campaign</field>
+        <field name="arch" type="xml">
+            <search string="WhatsApp Campaigns">
+                <field name="name"/>
+                <field name="phone_id"/>
+                <field name="template_id"/>
+                <filter name="sending" string="Sending" domain="[('state', '=', 'sending')]"/>
+                <filter name="scheduled" string="Scheduled" domain="[('state', '=', 'scheduled')]"/>
+                <filter name="completed" string="Completed" domain="[('state', '=', 'completed')]"/>
+                <separator/>
+                <group>
+                    <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_phone" string="WhatsApp Number" context="{'group_by': 'phone_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_whatsapp_campaign" model="ir.actions.act_window">
+        <field name="name">Campaigns</field>
+        <field name="res_model">otm.whatsapp.campaign</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Company-scoped visibility, matching the base module's own
+         manager-level rule convention (see otm_whatsapp_coexistence's
+         whatsapp_security_rules.xml). Campaign sending is a manager/admin
+         feature, not a plain-agent one - no separate group_whatsapp_user
+         rule is defined here. -->
+    <record id="rule_whatsapp_campaign_manager" model="ir.rule">
+        <field name="name">WhatsApp Campaign: Manager sees company campaigns</field>
+        <field name="model_id" ref="model_otm_whatsapp_campaign"/>
+        <field name="groups" eval="[(4, ref('otm_whatsapp_coexistence.group_whatsapp_manager'))]"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

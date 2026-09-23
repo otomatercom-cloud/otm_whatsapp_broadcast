@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_whatsapp_campaign_import_wizard_form" model="ir.ui.view">
+        <field name="name">otm.whatsapp.campaign.import.wizard.form</field>
+        <field name="model">otm.whatsapp.campaign.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import Campaign Recipients">
+                <field name="campaign_id" invisible="1"/>
+                <group>
+                    <field name="numbers_text" nolabel="1" placeholder="919876543210,Anjali Menon&#10;919876500000"/>
+                </group>
+                <footer>
+                    <button name="action_import" type="object" string="Import" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_whatsapp_campaign_import_wizard" model="ir.actions.act_window">
+        <field name="name">Import Campaign Recipients</field>
+        <field name="res_model">otm.whatsapp.campaign.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_campaign_id': active_id}</field>
+    </record>
+</odoo>

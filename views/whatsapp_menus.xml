@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Hangs off the base module's existing WhatsApp root menu - no
+         separate top-level app menu for this module. -->
+    <menuitem id="menu_whatsapp_campaign"
+              name="Campaigns"
+              parent="otm_whatsapp_coexistence.menu_whatsapp_root"
+              action="action_whatsapp_campaign"
+              groups="otm_whatsapp_coexistence.group_whatsapp_manager"
+              sequence="50"/>
+</odoo>
